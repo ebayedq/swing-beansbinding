@@ -10,6 +10,8 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+
 import org.jdesktop.beansbinding.BindingListener;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.Property;
@@ -544,6 +546,7 @@ public final class JTableBinding<E, SS, TS> extends AutoBinding<SS, List<E>, TS,
         private boolean editableSet;
         private String columnName;
         private Object editingObject;
+        private Predicate<E> editableWhen;
 
         private ColumnBinding(int column, Property<E, ?> columnProperty, String name) {
             super(column, columnProperty, new ColumnProperty(), name);
@@ -639,6 +642,21 @@ public final class JTableBinding<E, SS, TS> extends AutoBinding<SS, List<E>, TS,
          */
         public boolean isEditable() {
             return editable;
+        }
+
+
+        /**
+         * Predicate that tests whether this column should be editable based on the current row.
+         * @param editableWhen predicate based on current row
+         * @return the {@code ColumnBinding} itself, to allow for method chaining
+         */
+        public ColumnBinding setEditableWhen(Predicate<E> editableWhen) {
+            this.editableWhen = editableWhen;
+            return this;
+        }
+
+        public Predicate<E> getEditableWhen() {
+            return editableWhen;
         }
 
         private void bindUnmanaged0() {
@@ -811,6 +829,13 @@ public final class JTableBinding<E, SS, TS> extends AutoBinding<SS, List<E>, TS,
             }
 
             ColumnBinding binding = JTableBinding.this.getColumnBinding(columnIndex);
+
+            Predicate<E> condition = binding.getEditableWhen();
+
+            if (condition != null) {
+                return condition.test((E) getElement(rowIndex));
+            }
+
             if (!binding.isEditable()) {
                 return false;
             }
