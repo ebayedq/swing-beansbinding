@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/ebayedq/swing-beansbinding.svg)](https://jitpack.io/#ebayedq/swing-beansbinding)
+
 # Beans Binding (JSR 295)
 
 This is a fork of the [JSR-295](https://jcp.org/en/jsr/detail?id=295) reference implementation.
